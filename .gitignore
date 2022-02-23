@@ -1,1 +1,3 @@
-watchlist/virtual
+virtual/
+*.pyc
+instance/
