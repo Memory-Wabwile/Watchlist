@@ -16,7 +16,7 @@ class Review:
         Review.all_reviews.clear()
 
     @classmethod
-    def get_reviews(cls,id)
+    def get_reviews(cls,id):
 
         response = []
 

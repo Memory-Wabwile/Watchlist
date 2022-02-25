@@ -33,9 +33,10 @@ def movie(movie_id):
     '''
     View movie page function that returns the movie details page and its data
     '''
-    movie = get_movie(id)
+    movie = get_movie(movie_id)
     title = f'{movie.title}'
-    return render_template('movie.html',title=title , movie=movie)
+    reviews = Review.get_reviews(movie.id)
+    return render_template('movie.html',title=title , movie=movie , reviews=reviews)
 
 
 @app.route('/search/<movie_name>')
@@ -63,16 +64,5 @@ def new_review(id):
         return redirect(url_for('movie',id = movie.id ))
 
     title = f'{movie.title} review'
-    return render_template('new_review.html',title = title, review_form=form, movie=movie)
+    return render_template('new_review.html',title = title, review_form = form, movie = movie)
 
-@app.route('/movie/<int:id>')
-def movie(id):
-
-    '''
-    View movie page function that returns the movie details page and its data
-    '''
-    movie = get_movie(id)
-    title = f'{movie.title}'
-    reviews = Review.get_reviews(movie.id)
-
-    return render_template('movie.html',title = title,movie = movie,reviews = reviews)
