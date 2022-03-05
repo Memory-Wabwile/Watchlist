@@ -1,10 +1,13 @@
-from flask import render_template
-from app import app
+# from flask import render_template
 from flask import render_template,request,redirect,url_for
-from ..request import get_movies
+from app import main
 from ..request import get_movies,get_movie,search_movie
-from ..models import reviews
+from ..models import Review
 from .forms import ReviewForm
+from flask_login import login_required , current_user
+import markdown2
+
+
 Review = reviews.Review
 
 # Views
@@ -66,3 +69,31 @@ def new_review(id):
     title = f'{movie.title} review'
     return render_template('new_review.html',title = title, review_form = form, movie = movie)
 
+
+@main.route('/movie/review/new/<int:id>', methods = ['GET','POST'])
+@login_required
+def new_review(id):
+    form = ReviewForm()
+    movie = get_movie(id)
+    if form.validate_on_submit():
+        title = form.title.data
+        review = form.review.data
+
+        # Updated review instance
+        new_review = Review(movie_id=movie.id,movie_title=title,image_path=movie.poster,movie_review=review,user=current_user)
+
+        # save review method
+        new_review.save_review()
+        return redirect(url_for('.movie',id = movie.id ))
+
+    title = f'{movie.title} review'
+    return render_template('new_review.html',title = title, review_form=form, movie=movie)
+
+
+@main.route('/review/<int:id>')
+def single_review(id):
+    review=Review.query.get(id)
+    if review is None:
+        abort(404)
+    format_review = markdown2.markdown(review.movie_review,extras=["code-friendly", "fenced-code-blocks"])
+    return render_template('review.html',review = review,format_review=format_review)
